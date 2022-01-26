@@ -48,20 +48,17 @@ def create_qr(id):
         save_name=id+"_qr.png",
         save_dir=save_dir
     )
-    link = telegraph(save_dir+"/"+id+"_qr.png")
-    return link
+    return telegraph(save_dir+"/"+id+"_qr.png")
 
 @app.route('/<id>')
 def payment(id):
-    if '@' in id:
-        """Displays the QR and Payment Info."""
-        qr = create_qr(id)
-        if qr:
-            return render_template('home.html',id=id,qr=create_qr(id))
-        else:
-            return "Something went wrong!"
-    else:
+    if '@' not in id:
         return render_template("create.html")
+    """Displays the QR and Payment Info."""
+    if qr := create_qr(id):
+        return render_template('home.html',id=id,qr=create_qr(id))
+    else:
+        return "Something went wrong!"
     
 
 @app.route('/')
@@ -70,19 +67,18 @@ def homepage():
 
 @app.route('/<id>/<amount>')
 def amount_payment(id,amount):
-    if '@' in id:
-        """Displays the QR and Payment Info."""
-        qr = create_qr(id)
-        try:
-            amount = round(float(amount),2)
-        except Exception:
-            amount = None
-        if qr:
-            return render_template('home.html',id=id,qr=create_qr(id),amount=amount)
-        else:
-            return "Something went wrong!"
-    else:
+    if '@' not in id:
         return render_template("create.html")
+    """Displays the QR and Payment Info."""
+    qr = create_qr(id)
+    try:
+        amount = round(float(amount),2)
+    except Exception:
+        amount = None
+    if qr:
+        return render_template('home.html',id=id,qr=create_qr(id),amount=amount)
+    else:
+        return "Something went wrong!"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port=5000,use_reloader=True)
